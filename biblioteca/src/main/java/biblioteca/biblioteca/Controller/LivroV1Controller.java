@@ -2,7 +2,6 @@ package biblioteca.biblioteca.Controller;
 
 import biblioteca.biblioteca.Dto.LivroPostPutDto;
 import biblioteca.biblioteca.Dto.LivroResponseDto;
-import biblioteca.biblioteca.Service.AutorCrudService;
 import biblioteca.biblioteca.Service.LivroCrudService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,7 @@ public class LivroV1Controller {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<LivroResponseDto>> buscarTodosAutores() {
+    public ResponseEntity<List<LivroResponseDto>> buscarTodosLivros() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(livroCrudService.buscarTodosLivros());
@@ -42,17 +41,20 @@ public class LivroV1Controller {
                 .body(livroCrudService.buscarLivro(id));
     }
 
-    @GetMapping("/isbn")
-    public ResponseEntity<LivroResponseDto> buscarLivro(@PathVariable String isbn) {
+    // ex.: /v1/livros/busca?isbn=978 ou /v1/livros/busca?titulo=senhor
+    @GetMapping("/busca")
+    public ResponseEntity<List<LivroResponseDto>> buscarLivros(
+            @RequestParam(required = false) String isbn,
+            @RequestParam(required = false) String titulo) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(livroCrudService.buscarLivro(isbn));
+                .body(livroCrudService.buscarLivros(isbn, titulo));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<LivroResponseDto> atualizarLivro(
             @PathVariable Long id,
-            @RequestBody @Valid LivroResponseDto livroPostPutDto) {
+            @RequestBody @Valid LivroPostPutDto livroPostPutDto) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(livroCrudService.atualizarLivro(id, livroPostPutDto));
@@ -61,6 +63,14 @@ public class LivroV1Controller {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removerLivro(@PathVariable Long id) {
         livroCrudService.removerLivro(id);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
+
+    @DeleteMapping("/isbn/{isbn}")
+    public ResponseEntity<Void> removerLivroPorIsbn(@PathVariable String isbn) {
+        livroCrudService.removerLivro(isbn);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();

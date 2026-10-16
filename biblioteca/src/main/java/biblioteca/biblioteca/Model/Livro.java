@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Builder
@@ -23,7 +25,7 @@ public class Livro {
     @JsonProperty("tituloLivro")
     private String tituloLivro;
 
-    @Column(name = "ds_isbn", nullable = false)
+    @Column(name = "ds_isbn", nullable = false, unique = true)
     @JsonProperty("isbn")
     private String isbn;
 
@@ -35,8 +37,11 @@ public class Livro {
     @JsonProperty("edicao")
     private String edicao;
 
-    @Column(name = "ds_autor", nullable = false)
-    @JsonProperty("autor")
+    // muitos livros para um autor
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "autor_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Autor autor;
 
 }
